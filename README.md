@@ -10,9 +10,58 @@ It works both on Node.JS and [browsers that support](https://caniuse.com/atob-bt
 
 I often have the need to cache the data I retrieve through API calls, but most of the packages available are outdated, not fully typed or don't do exactly what I need.
 
+## Tooling
+
+- TypeScript
+- Jest
+- Babel
+- Prettier
+- Eslint
+
+## Tests
+
+`yarn test`
+
+The code has 100% coverage (tests are run both with `node` and `jsdom` to ensure compatibility with both).
+
+## Parameters
+
+`mapCache` exposes the `fetch`, `clear` and `size` methods.
+
+The `fetch` method takes as parameter an object with the following properties:
+
+| Property         | Optional | Default     | Description                                                            |
+| ---------------- | -------- | ----------- | ---------------------------------------------------------------------- |
+| key              | no       |             | An arbitrary string                                                    |
+| params           | yes      |             | If the calback yelds differets data based on parameters, add them here |
+| callback         | no       |             | The callback used to fetch the data you want to cache                  |
+| expiresInSeconds | yes      | 300 (5 min) | How long the data will last in the cache                               |
+
+```ts
+// <T> is the type of the data that will be returned from callback
+mapCache.fetch<T>({
+  key: 'someKey', // an arbitrary string
+  params: { id: 0 }, // optional
+  callback: () => 'data', // the function returned data will be stored in the cache
+  expiresInSeconds: 10 // optional, defaults to 5 minutes
+})
+```
+
+The `clear` method clears the cache.
+
+```ts
+mapCache.clear()
+```
+
+The `size` method returns the number of entries stored in the cache.
+
+```ts
+console.log(mapCache.size())
+```
+
 ## Usage
 
-Basic usage
+**Basic usage**
 
 ```ts
 import mapCache from 'ts-map-cache'
@@ -33,9 +82,11 @@ async function basicExample() {
 basicExample()
 ```
 
-With Expiration
+**With expiration**
 
 ```ts
+import mapCache from 'ts-map-cache'
+
 async function basicExampleWithExpiration() {
   const someFunction = async () => {
     console.log('I have been called!')
@@ -58,9 +109,13 @@ async function basicExampleWithExpiration() {
 basicExampleWithExpiration()
 ```
 
-With Params
+**With params**
+
+Params is useful when the same function returns different values based on the parameters it receives. Passing the parameters also to the `fetch` method will automatically build an unique id for that function/returned data. It can be useful, for example, with `GraphQL` query resolvers.
 
 ```ts
+import mapCache from 'ts-map-cache'
+
 async function basicExampleWithParams() {
   const someFunction = async (params: { id: number }) => {
     console.log(`I have been called with id ${params.id}!`)
@@ -89,7 +144,7 @@ async function basicExampleWithParams() {
 basicExampleWithParams()
 ```
 
-With network request
+**With a network request**
 
 ```ts
 import mapCache from 'ts-map-cache'
@@ -119,11 +174,3 @@ async function main() {
 
 main()
 ```
-
-## Tech
-
-- TypeScript
-
-## Tests
-
-`yarn test`
