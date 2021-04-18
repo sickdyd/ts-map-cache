@@ -26,7 +26,7 @@
     "typescript": "^4.2.4"
   },
   "scripts": {
-    "publish": "yarn build && npm publish",
+    "deploy": "yarn build && npm publish",
     "build": "babel src --out-dir dist --extensions '.ts' --ignore /**/*.test.ts --ignore /**/*.d.ts && tsc --emitDeclarationOnly",
     "test": "jest --coverage",
     "typecheck": "tsc --noEmit"
