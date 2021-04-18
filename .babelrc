@@ -1,0 +1,19 @@
+{
+  "presets": [
+    "@babel/preset-typescript",
+    [
+      "minify",
+      {
+        "mangle": false
+      }
+    ],
+    [
+      "@babel/preset-env",
+      {
+        "targets": { "node": 14 }
+      }
+    ]
+  ],
+  "sourceMaps": true,
+  "comments": false
+}
