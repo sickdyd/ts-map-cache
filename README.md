@@ -14,7 +14,7 @@ I often have the need to cache the data I retrieve through API calls, but most o
 
 Basic usage
 
-```
+```ts
 import mapCache from 'ts-map-cache'
 
 async function basicExample() {
@@ -35,7 +35,7 @@ basicExample()
 
 With Expiration
 
-```
+```ts
 async function basicExampleWithExpiration() {
   const someFunction = async () => {
     console.log('I have been called!')
@@ -56,12 +56,11 @@ async function basicExampleWithExpiration() {
 }
 
 basicExampleWithExpiration()
-
 ```
 
 With Params
 
-```
+```ts
 async function basicExampleWithParams() {
   const someFunction = async (params: { id: number }) => {
     console.log(`I have been called with id ${params.id}!`)
@@ -88,12 +87,11 @@ async function basicExampleWithParams() {
 }
 
 basicExampleWithParams()
-
 ```
 
 With network request
 
-```
+```ts
 import mapCache from 'ts-map-cache'
 import axios from 'axios'
 
