@@ -1,9 +1,29 @@
 {
   "name": "ts-map-cache",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "./dist/index.js",
-  "author": "sickdyd",
+  "author": "Reale Roberto Josef Antonio",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sickdyd/ts-map-cache.git"
+  },
+  "keywords": [
+    "cache",
+    "ts-cache",
+    "js-cache",
+    "map-cache",
+    "ts-map-cache",
+    "mem-cache",
+    "caching",
+    "node-cache",
+    "react-cache",
+    "graphql-cache"
+  ],
+  "bugs": {
+    "url": "https://github.com/sickdyd/ts-map-cache/issues"
+  },
+  "homepage": "https://github.com/sickdyd/ts-map-cache#readme",
   "private": false,
   "types": "./dist/index.d.ts",
   "files": [
