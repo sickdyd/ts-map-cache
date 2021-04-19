@@ -37,7 +37,6 @@ class MapCache implements IStorageCache {
     expiresInSeconds = DEFAULT_EXPIRATION_SECONDS
   }: FetchParams): Promise<T> {
     const cacheKey = this.generateKey({ key, params })
-
     const data = this.get<T>(cacheKey)
 
     return data ? data : this.set<T>({ key: cacheKey, data: await callback(), expiresInSeconds })

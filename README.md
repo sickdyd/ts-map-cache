@@ -37,9 +37,11 @@ The `fetch` method takes as parameter an object with the following properties:
 | callback         | no       |             | The callback used to fetch the data you want to cache                  |
 | expiresInSeconds | yes      | 300 (5 min) | How long the data will last in the cache                               |
 
+**Example**
+
 ```ts
-// <T> is the type of the data that will be returned from callback
-mapCache.fetch<T>({
+// <T> is the type of the data that will be returned from the callback
+const data = await mapCache.fetch<T>({
   key: 'someKey', // an arbitrary string
   params: { id: 0 }, // optional
   callback: () => 'data', // the function returned data will be stored in the cache
@@ -67,11 +69,13 @@ console.log(mapCache.size())
 import mapCache from 'ts-map-cache'
 
 async function basicExample() {
-  const someFunction = async () => {
+  // The callback can be a sync or async function, but the fetch method has to be always awaited
+  const someFunction = () => {
     console.log('I have been called!')
     return 'some_data'
   }
 
+  // Since fetch is async, await it
   const data1 = await mapCache.fetch<string>({ key: 'basicFunction', callback: someFunction })
   console.log(`it called the function and returned the data: ${data1}`)
 
