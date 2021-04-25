@@ -1,6 +1,6 @@
 {
   "name": "ts-map-cache",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "./dist/index.js",
   "author": "Reale Roberto Josef Antonio",
   "license": "MIT",
@@ -8,6 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/sickdyd/ts-map-cache.git"
   },
+  "description": "Use JS Map object for caching for JavaScript (NodeJS and Broswers)",
   "keywords": [
     "cache",
     "ts-cache",
