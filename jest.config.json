@@ -1,0 +1,17 @@
+{
+  "clearMocks": true,
+  "collectCoverage": true,
+  "coverageDirectory": "coverage",
+  "coverageProvider": "v8",
+  "projects": [
+    {
+      "displayName": "browser",
+      "testEnvironment": "jsdom"
+    },
+    {
+      "displayName": "node",
+      "testEnvironment": "node"
+    }
+  ],
+  "testEnvironment": "jsdom"
+}
