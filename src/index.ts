@@ -13,7 +13,7 @@ export interface KeyParams {
 export interface StoredData<T> {
   key: string
   data: T
-  expiresInSeconds: number
+  expiration: number
 }
 
 export interface IStorageCache {
@@ -38,8 +38,9 @@ class MapCache implements IStorageCache {
   }: FetchParams): Promise<T> {
     const cacheKey = this.generateKey({ key, params })
     const data = this.get<T>(cacheKey)
+    const expiration = this.computeExpirationTime(expiresInSeconds)
 
-    return data ? data : this.set<T>({ key: cacheKey, data: await callback(), expiresInSeconds })
+    return data ? data : this.set<T>({ key: cacheKey, data: await callback(), expiration })
   }
 
   clear(): void {
@@ -48,6 +49,10 @@ class MapCache implements IStorageCache {
 
   size(): number {
     return this.cache.size
+  }
+
+  private computeExpirationTime(expiresInSeconds: number): number {
+    return new Date().getTime() + expiresInSeconds * 1000
   }
 
   // This method returns a base64 string containing a combination of a key and parameters
@@ -69,10 +74,10 @@ class MapCache implements IStorageCache {
     }
   }
 
-  // Store the data in memory and attach to the object expiresInSeconds containing the
+  // Store the data in memory and attach to the object expiration containing the
   // expiration time.
-  private set<T>({ key, data, expiresInSeconds }: StoredData<T>): T {
-    this.cache.set(key, { data, expiresInSeconds })
+  private set<T>({ key, data, expiration }: StoredData<T>): T {
+    this.cache.set(key, { data, expiration })
 
     return data
   }
@@ -81,20 +86,16 @@ class MapCache implements IStorageCache {
   // the data has expired.
   private get<T>(key: string): T | null {
     if (this.cache.has(key)) {
-      const { data, expiresInSeconds } = this.cache.get(key) as StoredData<T>
+      const { data, expiration } = this.cache.get(key) as StoredData<T>
 
-      return this.hasExpired(expiresInSeconds) ? null : data
+      return this.hasExpired(expiration) ? null : data
     }
 
     return null
   }
 
-  private getExpirationInMs(expiresInSeconds: number): number {
-    return new Date().getTime() + expiresInSeconds * 1000
-  }
-
-  private hasExpired(expiresInSeconds: number): boolean {
-    return this.getExpirationInMs(expiresInSeconds) < new Date().getTime()
+  private hasExpired(expiration: number): boolean {
+    return expiration < new Date().getTime()
   }
 }
 

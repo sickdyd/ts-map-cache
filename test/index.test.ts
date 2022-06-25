@@ -1,12 +1,12 @@
-import memCache from '../src/index'
+import mapCache from '../src/index'
 
 interface IData {
   data: string
 }
 
-describe('memCache', () => {
+describe('mapCache', () => {
   beforeEach(() => {
-    memCache.clear()
+    mapCache.clear()
     jest.clearAllMocks()
   })
 
@@ -16,23 +16,23 @@ describe('memCache', () => {
   const key = 'KEY'
 
   it('should call the callback and return new data if there is no cached data', async () => {
-    const data = await memCache.fetch<IData>({ key, callback })
+    const data = await mapCache.fetch<IData>({ key, callback })
 
     expect(callback).toHaveBeenCalled()
     expect(data).toMatchObject(callbackReturnData)
   })
 
   it('calls the callback only once if data is cached', async () => {
-    await memCache.fetch<IData>({ key, callback })
-    await memCache.fetch<IData>({ key, callback })
+    await mapCache.fetch<IData>({ key, callback })
+    await mapCache.fetch<IData>({ key, callback })
 
     expect(callback).toHaveBeenCalledTimes(1)
-    expect(memCache.size()).toBe(1)
+    expect(mapCache.size()).toBe(1)
   })
 
   it('does not overwrite data if values are cached', async () => {
-    const data1 = await memCache.fetch<IData>({ key, callback })
-    const data2 = await memCache.fetch<IData>({
+    const data1 = await mapCache.fetch<IData>({ key, callback })
+    const data2 = await mapCache.fetch<IData>({
       key,
       callback: async () => Promise.resolve({ data: 'some other data' })
     })
@@ -42,34 +42,43 @@ describe('memCache', () => {
   })
 
   it('calls the callback if the data has expired', async () => {
-    await memCache.fetch<IData>({ key, callback, expiresInSeconds: -1 })
-    await memCache.fetch<IData>({ key, callback, expiresInSeconds: -1 })
+    jest.useFakeTimers().setSystemTime(new Date('2022-01-01T00:00:00.000'))
+
+    await mapCache.fetch<IData>({ key, callback, expiresInSeconds: 10 })
+
+    jest.useFakeTimers().setSystemTime(new Date('2022-01-01T00:00:11.000'))
+
+    await mapCache.fetch<IData>({ key, callback, expiresInSeconds: 10 })
+
+    jest.useFakeTimers().setSystemTime(new Date('2022-01-01T00:00:22.000'))
 
     expect(callback).toHaveBeenCalledTimes(2)
-    expect(memCache.size()).toBe(1)
+    expect(mapCache.size()).toBe(1)
+
+    jest.useRealTimers()
   })
 
   it('re-calls the callback if the params changed', async () => {
-    await memCache.fetch<IData>({ key, params: { date: new Date('2021/10/02') }, callback })
-    await memCache.fetch<IData>({ key, params: { date: new Date('2020/10/02') }, callback })
+    await mapCache.fetch<IData>({ key, params: { date: new Date('2021/10/02') }, callback })
+    await mapCache.fetch<IData>({ key, params: { date: new Date('2020/10/02') }, callback })
 
     expect(callback).toHaveBeenCalledTimes(2)
-    expect(memCache.size()).toBe(2)
+    expect(mapCache.size()).toBe(2)
   })
 
   it('clears the cache', async () => {
-    await memCache.fetch<IData>({ key, callback })
-    await memCache.fetch<IData>({ key: 'ANOTHER_KEY', callback })
+    await mapCache.fetch<IData>({ key, callback })
+    await mapCache.fetch<IData>({ key: 'ANOTHER_KEY', callback })
 
-    expect(memCache.size()).toBe(2)
-    memCache.clear()
-    expect(memCache.size()).toBe(0)
+    expect(mapCache.size()).toBe(2)
+    mapCache.clear()
+    expect(mapCache.size()).toBe(0)
   })
 
   it('returns the number of cached values', async () => {
-    await memCache.fetch<IData>({ key, callback })
-    await memCache.fetch<IData>({ key: 'ANOTHER_KEY', callback })
+    await mapCache.fetch<IData>({ key, callback })
+    await mapCache.fetch<IData>({ key: 'ANOTHER_KEY', callback })
 
-    expect(memCache.size()).toBe(2)
+    expect(mapCache.size()).toBe(2)
   })
 })
