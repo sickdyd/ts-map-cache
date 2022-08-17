@@ -81,4 +81,13 @@ describe('mapCache', () => {
 
     expect(mapCache.size()).toBe(2)
   })
+
+  it('deletes cached values after expiration time when delete is true', async () => {
+    await mapCache.fetch<IData>({ key, callback, expiresInSeconds: 1, deleteOnExpiry: true })
+
+    expect(mapCache.size()).toBe(1)
+    await new Promise(resolve => setTimeout(resolve, 1050)); // wait a little longer than 1s
+    expect(mapCache.size()).toBe(0)
+  })
+  
 })

@@ -3,6 +3,7 @@ export interface FetchParams {
   params?: any
   callback(): any
   expiresInSeconds?: number
+  deleteOnExpiry?: boolean
 }
 
 export interface KeyParams {
@@ -34,13 +35,14 @@ class MapCache implements IStorageCache {
     key,
     params = null,
     callback,
-    expiresInSeconds = DEFAULT_EXPIRATION_SECONDS
+    expiresInSeconds = DEFAULT_EXPIRATION_SECONDS,
+    deleteOnExpiry = false
   }: FetchParams): Promise<T> {
     const cacheKey = this.generateKey({ key, params })
     const data = this.get<T>(cacheKey)
     const expiration = this.computeExpirationTime(expiresInSeconds)
 
-    return data ? data : this.set<T>({ key: cacheKey, data: await callback(), expiration })
+    return data ? data : this.set<T>({ key: cacheKey, data: await callback(), expiration}, deleteOnExpiry, expiresInSeconds)
   }
 
   clear(): void {
@@ -76,8 +78,17 @@ class MapCache implements IStorageCache {
 
   // Store the data in memory and attach to the object expiration containing the
   // expiration time.
-  private set<T>({ key, data, expiration }: StoredData<T>): T {
+  private set<T>({ key, data, expiration }: StoredData<T>, deleteOnExpiry = false, expiresInSeconds = 0): T {
     this.cache.set(key, { data, expiration })
+
+    if (deleteOnExpiry && expiresInSeconds > 0) {
+      setTimeout(() => {
+        if (this.cache.has(key)) {
+          this.cache.delete(key)
+        }
+      } , expiresInSeconds * 1000)
+    }
+    
 
     return data
   }
@@ -87,7 +98,7 @@ class MapCache implements IStorageCache {
   private get<T>(key: string): T | null {
     if (this.cache.has(key)) {
       const { data, expiration } = this.cache.get(key) as StoredData<T>
-
+      
       return this.hasExpired(expiration) ? null : data
     }
 
